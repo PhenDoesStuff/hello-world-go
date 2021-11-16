@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/stephenmontague/hello-world-go/pkg/config"
-	"github.com/stephenmontague/hello-world-go/pkg/handlers"
+	"github.com/stephenmontague/hello-world-go/pkg/models"
 )
 
 var functions = template.FuncMap{
@@ -23,8 +23,12 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
 // RenderTemplate renders templates using html templates
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *handlers.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 
 	if app.UseCache {
@@ -41,7 +45,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *handlers.TemplateDat
 
 	buf := new(bytes.Buffer)
 
-	_ = t.Execute(buf, nil)
+	td = AddDefaultData(td)
+
+	_ = t.Execute(buf, td)
 
 	_, err := buf.WriteTo(w)
 	if err != nil {
@@ -54,7 +60,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *handlers.TemplateDat
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./templates/*.page.html")
+	pages, err := filepath.Glob("./templates/*.page.tmpl")
 	if err != nil {
 		return myCache, err
 	}
@@ -66,13 +72,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return myCache, err
 		}
 
-		matches, err := filepath.Glob("./templates/*.layout.html")
+		matches, err := filepath.Glob("./templates/*.layout.tmpl")
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob("./templates/*.layout.html")
+			ts, err = ts.ParseGlob("./templates/*.layout.tmpl")
 			if err != nil {
 				return myCache, err
 			}
