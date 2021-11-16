@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/stephenmontague/hello-world-go/pkg/config"
+	"github.com/stephenmontague/hello-world-go/pkg/handlers"
 )
 
 var functions = template.FuncMap{
@@ -23,8 +24,9 @@ func NewTemplates(a *config.AppConfig) {
 }
 
 // RenderTemplate renders templates using html templates
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *handlers.TemplateData) {
 	var tc map[string]*template.Template
+
 	if app.UseCache {
 		// get the template cache from the app config
 		tc = app.TemplateCache

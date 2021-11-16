@@ -10,7 +10,7 @@ import (
 	"github.com/stephenmontague/hello-world-go/pkg/render"
 )
 
-const portNumber = ":8081"
+const portNumber = ":8080"
 
 // main is the main application function
 func main() {
